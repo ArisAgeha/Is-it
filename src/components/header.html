@@ -1,44 +1,10 @@
-<template>
-    <div class="header-wrapper">
-        <div class="header">
-            <div class="tabs">
-                <span class="tabs-logo">IS-IT</span>
-                <span class="tabs-tab">首页</span>
-                <span class="tabs-tab">话题</span>
-                <div class="tabs-search-wrapper">
-                    <input class="tabs-search-input" type="text">
-                    <button class="tabs-search-submit">搜索</button>
-                </div>
-            </div>
-            <div v-if="isLogin" class="userInfo">{{username}}</div>
-            <div v-else class="loginBar">
-                <button class="loginButton">登录</button>
-                <button class="signupButton">注册</button>
-            </div>
-        </div>
-    </div>
-</template>
-
-
-<script>
-let req = require('../models/req.js');
-
-export default {
-    methods: {
-        
-    },
-    computed: {
-        username: function() {
-            return this.$store.state.username
-        },
-        isLogin: function() {
-            return this.$store.state.isLogin
-        }
-    }
-}
-</script>
-
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
 <style>
 .header-wrapper {
     box-shadow: 0 1px 3px rgba(26, 26, 26, .1);
@@ -112,28 +78,38 @@ export default {
 }
 .header .loginBar button {
     line-height: 30px;
-    height: 34px;
-    padding: 0 16px;
-    border-radius: 3px;
-    cursor:pointer;
+    hegiht: 34px;
+    color: #0084ff;
+
 }
 .header .loginBar .loginButton {
-    color: #0084ff;
-    border: 1px solid #0084ff;
-    background-color: #fff;
-    margin-right: 16px;
-    text-align: center;
+    border-color: #fff;
 }
-.header .loginBar .loginButton:hover {
-    background-color: rgba(0, 132, 255, 0.1);
-}
-.header .loginBar .signupButton {
+.header .loginBar .loginButton {
     border-color: #0084ff;
-    background-color: #0084ff;
-    color: #fff;
-}
-.header .loginBar .signupButton:hover {
-    border-color: #0077e6;
-    background-color: #0077e6;
 }
 </style>
+<script>
+let req = require('../models/req.js');
+
+export default {
+    methods: {
+        
+    },
+    computed: {
+        username: function() {
+            return this.$store.state.username
+        },
+        isLogin: function() {
+            return this.$store.state.isLogin
+        }
+    }
+}
+</script>
+    
+</body>
+</html>
+
+
+
+
