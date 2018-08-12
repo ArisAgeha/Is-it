@@ -26,20 +26,7 @@
     </div>
 </template>
 
-<script>
-</script>
 
-<style>
-.header {
-    display: flex;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-}
-button {
-    margin-right: 15px;
-    padding: 10px 20px;
-}
-</style>
 
 <script>
 function req(method, path, body) {
@@ -220,3 +207,15 @@ export default {
     }
 }
 </script>
+
+<style>
+.header {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}
+button {
+    margin-right: 15px;
+    padding: 10px 20px;
+}
+</style>
