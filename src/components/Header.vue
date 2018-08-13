@@ -10,7 +10,9 @@
                     <button class="tabs-search-submit">搜索</button>
                 </div>
             </div>
-            <div v-if="isLogin" class="userInfo">{{username}}</div>
+            <div v-if="isLogin" class="userInfo">
+                <span class="greeting">您好，</span>{{username}} <span @click="logout" class="logout">注销</span>
+            </div>
             <div v-else class="loginBar">
                 <button @click="showLoginPanel" class="loginButton">登录 / 注册</button>
             </div>
@@ -23,10 +25,10 @@
                         <div class="loginMessage-body">
                             是这样吗
                         </div>
-                        <input class="username" type="text">
-                        <input class="password" type="password">
-                        <button class="loginSubmit">登录</button>
-                        <button class="signupSubmit">注册</button>
+                        <input id="username" class="username" type="text">
+                        <input id="password" class="password" type="password">
+                        <button @click="login" class="loginSubmit">登录</button>
+                        <button @click="signup" class="signupSubmit">注册</button>
                     </div>
                 </div>
             </div>
@@ -163,10 +165,15 @@
     transform: scale(0);
 }
 .header .userInfo {
-    font-size: 18px;
-    cursor: pointer;
+    font-size: 17px;
     line-height: 30px;
 }
+.header .userInfo .logout {
+    color: #0084ff;
+    font-size: 14px;
+    cursor: pointer;
+}
+
 .header .loginBar {
     disply: flex;
     align-items: center;
@@ -182,7 +189,6 @@
     color: #fff;
     border: 1px solid #0084ff;
     background-color: #0084ff;
-    margin-right: 16px;
     text-align: center;
 }
 .header .loginBar .loginButton:hover {
@@ -205,15 +211,96 @@ export default {
         },
         showLoginPanel() {
             this.showLogin = true;
+        },
+        login() {
+            let username = document.querySelector('#username').value.trim();
+            let password = document.querySelector('#password').value.trim();
+            if (username.length === 0) {
+                this.$store.dispatch('hint', {text: '用户名不能为空', hintStatus: 'fail'})
+                return;
+            } else if (password.length ===0) {
+                this.$store.dispatch('hint', {text: '密码不能为空', hintStatus: 'fail'})
+                return;
+            }
+
+            this.$store.dispatch('login', {
+                username,
+                password
+            }).then((res) => {
+                if (res.username) {
+                    this.$store.dispatch('hint', {text: '登录成功！', hintStatus: 'success'});
+                    this.showLogin= false;
+                    return;
+                } else if (res.code === 211) {
+                    this.$store.dispatch('hint', {text: '用户名不存在！', hintStatus: 'fail'});
+                } else if (res.code === 210) {
+                    this.$store.dispatch('hint', {text: '用户名与密码不匹配！', hintStatus: 'fail'});
+                } else if (res.code === 219) {
+                    this.$store.dispatch('hint', {text: '登录失败超过次数限制！请等待15分钟！', hintStatus: 'fail'});
+                } else {
+                    this.$store.dispatch('hint', {text: '未知原因登录错误，请重试。', hintStatus: 'fail'});
+                }
+            })
+        },
+        signup() {
+            let username = document.querySelector('#username').value.trim();
+            let password = document.querySelector('#password').value.trim();
+            if (username.length === 0) {
+                this.$store.dispatch('hint', {text: '用户名不能为空', hintStatus: 'fail'})
+                return;
+            } else if (password.length ===0) {
+                this.$store.dispatch('hint', {text: '密码不能为空', hintStatus: 'fail'})
+                return;
+            } else if (username.length > 16) {
+                this.$store.dispatch('hint', {text: '用户名不能超过16位', hintStatus: 'fail'})
+                return;
+            } else if (password.length > 16) {
+                this.$store.dispatch('hint', {text: '密码不能超过16位', hintStatus: 'fail'})
+                return;
+            }
+
+            this.$store.dispatch('signup', {
+                username,
+                password
+            }).then((res) => {
+                if (res.code === 202) {
+                    this.$store.dispatch('hint', {text: '该用户名已被使用', hintStatus: 'fail'});
+                    return;   
+                } else if (res.code === 2) {
+                    this.$store.dispatch('hint', {text: '请先退出登录！', hintStatus: 'fail'});
+                    return;   
+                } else if (res.code) {
+                    this.$store.dispatch('hint', {text: '未知原因注册错误，请重试。', hintStatus: 'fail'});
+                    return;   
+                } else if (res.username){
+                    this.$store.dispatch('hint', {text: '注册成功，请登录。', hintStatus: 'success'});
+                }
+            })
+        },
+        logout() {
+            document.cookie = 'sessionToken=;  expires=Thu, 01 Jan 1970 00:00:01 GMT;'
+            this.$store.commit('logout');
+            this.$store.dispatch('hint', {text: '注销成功。', hintStatus: 'success'});
         }
     },
     computed: {
         username() {
-            return this.$store.state.username
+            return this.$store.state.currentUser.username;
         },
         isLogin() {
-            return this.$store.state.isLogin
+            return this.$store.state.isLogin;
         }
+    },
+    beforeCreate() {
+        let cookieMatch = document.cookie.match(/(?<=\bsessionToken=)\w+/);
+        if (cookieMatch && cookieMatch[0]) {
+            let userCookie = cookieMatch[0];
+            if (userCookie) {
+                this.$store.dispatch('loginByCookie', {sessionToken: userCookie}).then((res) => {
+                    console.log(res);
+                })
+            }
+        } 
     }
 }
 </script>

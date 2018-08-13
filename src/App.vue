@@ -1,17 +1,21 @@
 <template>
   <div id="app">
       <Header></Header>
+      <Hinter></Hinter>
+      <indexContent></indexContent>
   </div>
 </template>
 
 <script>
+import Hinter from './components/Hinter.vue'
 import Header from './components/Header.vue'
-import indexCard from './components/indexCard.vue'
+import indexContent from './components/indexContent.vue'
 
 export default {
     components: {
+        Hinter,
         Header,
-        indexCard
+        indexContent
     }
 }
 </script>
@@ -26,6 +30,7 @@ body {
     color: #1a1a1a;
     background: #f6f6f6;
     -webkit-tap-highlight-color: rgba(26,26,26,0);
+    min-height: 100vh;
 }
 </style>
 
