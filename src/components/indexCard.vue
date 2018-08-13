@@ -27,7 +27,11 @@
                 </div>
             </div>
             <div class="commentPage">
-                <span :class="{currentPage: isCurrentPage(index)}" v-for="(page, index) in pages" class="pageButton">{{index + 1}}</span>
+                <span :class="{currentPage: isCurrentPage(page), pagination: isPagination(page), nextPage: isNextPage(page), prevPage: isPrevPage(page)}" 
+                    v-for="(page, index) in pages" 
+                    class="pageButton"
+                    @click="switchPage(page)"
+                    >{{page}}</span>
             </div>
             <div class="addComment"></div>
         </div>
@@ -120,8 +124,10 @@
 .commentWrapper .commentPage .pageButton{
     padding: 0 15px;
     cursor: pointer;
+    user-select: none;
 }
-.commentWrapper .commentPage .currentPage{
+.commentWrapper .commentPage .currentPage,
+.commentWrapper .commentPage .pagination{
     cursor: default;
     color: #8590a6;
 }
@@ -143,7 +149,7 @@ export default {
             isAgree: false,
             showComment: false,
             comments: [],
-            pages: [1],
+            pages: [],
             currentPage: 1
         }
     },
@@ -158,14 +164,24 @@ export default {
             this.hasAnswer = true;   
             this.answer = answer;
             this.user = answer.userID;
-            this.pages.length = Math.ceil(answer.commentCount / 20) + 1;
+            let pageCount = Math.ceil(answer.commentCount / 20) + 20;
+            this.pages.push('上一页');
+            if (pageCount <= 5) {
+                for (let i = 1; i <= pageCount; i++) {
+                    this.pages.push(i);
+                }
+            } else {
+                for (let i = 1; i <= 4; i++) {
+                    this.pages.push(i);
+                }
+                this.pages.push('...');
+                this.pages.push(pageCount);
+            }
+            this.pages.push('下一页')
         }
         else this.hasAnswer = false; 
     },
     methods: {
-        isCurrentPage(index) {
-            return (index + 1) === this.currentPage;
-        },
         switchText() {
             this.showEllipsis = !this.showEllipsis;
         },
@@ -178,9 +194,62 @@ export default {
             let skip = (page - 1) * 20 || 0;
             let url = `/fetch/comment?answerID=${answerID}&skip=${skip}`
             req('GET', url).then((res) => {
-                console.log(res)
                 this.comments = res;
             })
+        },
+        isCurrentPage(page) {
+            return page === this.currentPage;
+        },
+        isPagination(page) {
+            return page === '...';
+        },
+        isNextPage(page) {
+            return page === '下一页';
+        },
+        isPrevPage(page) {
+            return page === '上一页';
+        },
+        switchPage(page) {
+            let pageCount = this.pages[this.pages.length - 2];
+            let targetPage;
+            if (page === '上一页' && this.currentPage !== 1) targetPage = this.currentPage - 1;
+            else if (page === '下一页' && this.currentPage !== this.pages[this.pages.length - 2]) targetPage = this.currentPage + 1;
+            else if (typeof(page) === 'number') targetPage = page;
+            else return;
+            this.currentPage = targetPage;
+            let newPages = [];
+            newPages.push('上一页');
+            console.warn('targetPage: ' + targetPage);
+            console.warn('pageCount ' + pageCount);
+            if (pageCount <= 5) {
+                for(let i = 1; i <= pageCount; i++) {
+                    newPages.push(i);
+                }
+            } else if (pageCount > 5) {
+                if (pageCount - targetPage < 4) {
+                    newPages.push('...');
+                    for (let i = pageCount - 4; i <= pageCount; i++) {
+                        newPages.push(i);
+                    }
+                } else if (targetPage > 1) {
+                    newPages.push('...');
+                    for (let i = targetPage; i < targetPage + 3; i++) {
+                        newPages.push(i);
+                    }
+                    newPages.push('...');
+                    newPages.push(pageCount);
+                } else if (targetPage === 1) {
+                    for (let i = 1; i <= 4; i++) {
+                        newPages.push(i);
+                    } 
+                    newPages.push('...');
+                    newPages.push(pageCount);
+                }
+            }
+            newPages.push('下一页')
+            this.pages = newPages;
+            let skip = (targetPage - 1) * 20;
+            this.fetchComment(skip);
         }
     }
 }
