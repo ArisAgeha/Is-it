@@ -1,21 +1,25 @@
 <template>
   <div id="app">
       <Header></Header>
+      <div class="headerSticky"></div>
       <Hinter></Hinter>
-      <indexContent></indexContent>
+      <Index></Index>
+      <QuestionEditor></QuestionEditor>
   </div>
 </template>
 
 <script>
 import Hinter from './components/Hinter.vue'
 import Header from './components/Header.vue'
-import indexContent from './components/indexContent.vue'
+import Index from './components/Index.vue'
+import QuestionEditor from './components/QuestionEditor.vue'
 
 export default {
     components: {
         Hinter,
         Header,
-        indexContent
+        Index,
+        QuestionEditor
     }
 }
 </script>
@@ -31,6 +35,9 @@ body {
     background: #f6f6f6;
     -webkit-tap-highlight-color: rgba(26,26,26,0);
     min-height: 100vh;
+}
+.headerSticky {
+    height: 52px;
 }
 </style>
 

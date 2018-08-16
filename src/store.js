@@ -13,7 +13,8 @@ export default new Vuex.Store({
             text: 'test',
             hintStatus: 'success'
         },
-        clock: null
+        clock: null,
+        showQuestionEditor: false
     },
     mutations: {
         login(state, payload) {
@@ -23,6 +24,9 @@ export default new Vuex.Store({
         logout(state) {
             state.isLogin = false;
             state.currentUser = null;
+        },
+        toggleQuestionEditor(state) {
+            state.showQuestionEditor = !state.showQuestionEditor;
         }
     },
     actions: {

@@ -7,7 +7,7 @@
                 <span class="tabs-tab tabs-topic">话题</span>
                 <div class="tabs-search-wrapper">
                     <input class="tabs-search-input" type="text">
-                    <button class="tabs-search-submit">搜索</button>
+                    <button @click="addQuestion" class="tabs-addQuestion-submit">提问</button>
                 </div>
             </div>
             <div v-if="isLogin" class="userInfo">
@@ -74,6 +74,14 @@
     color: #0084ff;
     text-align: center;
 }
+.header-wrapper {
+    box-shadow: 0 1px 3px rgba(26, 26, 26, .1);
+    background-color: #fff;
+    position: fixed;
+    top:0;
+    left: 0;
+    right: 0;
+}
 .header-wrapper .mask input {
     outline: none;
     height: 48px;
@@ -99,10 +107,6 @@
     color: rgb(0, 132, 255)
 }
 
-.header-wrapper {
-    box-shadow: 0 1px 3px rgba(26, 26, 26, .1);
-    background-color: #fff;
-}
 .header {
     width: 1000px;
     min-width: 1000px;
@@ -148,7 +152,7 @@
     border: 1px solid #8590A6;
     width: 400px;
 }
-.header .tabs .tabs-search-wrapper .tabs-search-submit {
+.header .tabs .tabs-search-wrapper .tabs-addQuestion-submit {
     background-color: #0084ff;
     color: #fff;
     margin-left: 15px;
@@ -160,7 +164,7 @@
     transition: opacity .3s ease,transform .3s ease,-webkit-transform .3s ease;
 }
 
-.header .tabs .tabs-search-wrapper input:focus + .tabs-search-submit {
+.header .tabs .tabs-search-wrapper input:focus + .tabs-addQuestion-submit {
     opacity: 0;
     transform: scale(0);
 }
@@ -206,6 +210,14 @@ export default {
         }
     },
     methods: {
+        addQuestion() {
+            if (!this.$store.state.isLogin) {
+                this.$store.dispatch('hint', {text: '请先登录！', hintStatus: 'fail'});
+                return;
+            } else {
+                this.$store.commit('toggleQuestionEditor');
+            }
+        },
         hiddenLoginPanel() {
             this.showLogin = false;
         },
@@ -291,7 +303,7 @@ export default {
             return this.$store.state.isLogin;
         }
     },
-    beforeCreate() {
+    mounted() {
         let cookieMatch = document.cookie.match(/(?<=\bsessionToken=)\w+/);
         if (cookieMatch && cookieMatch[0]) {
             let userCookie = cookieMatch[0];

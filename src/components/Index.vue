@@ -3,7 +3,7 @@
         <div class="indexCard-wrapper">
             <indexCard class="indexCard" v-for="data in dataArray" :cardInfo="data"></indexCard>
         </div>
-        <div class="indexSidebar-wrapper">
+        <div class="indexSidebar-wrapper" :style="translateY">
             <indexSidebar></indexSidebar>
         </div>
     </div>
@@ -24,6 +24,8 @@
 .indexSidebar-wrapper {
     width: calc(30% - 5px);
     background-color: #ddd;
+    max-height: 80vh;
+    z-index: -1;
 }
 </style>
 
@@ -34,7 +36,8 @@ import indexSidebar from './indexSidebar.vue';
 export default {
     data() {
         return {
-            dataArray: null
+            dataArray: null,
+            shiftY: 0
         }
     },
     components: {
@@ -45,6 +48,19 @@ export default {
         req('get', '/fetch/index?skip=0').then((res) => {
             this.dataArray = res;
         })
+    },
+    computed: {
+        translateY() {
+            return {
+                transform: `translateY(${this.shiftY}px)`
+            }
+        }
+    },
+    created() {
+        window.onscroll = () => {
+            let value = window.pageYOffset;
+            this.shiftY = value;
+        }
     }
 }
 </script>

@@ -1,6 +1,6 @@
 <template>
     <div class="indexCard">
-        <div class="source">{{topic}}</div>
+        <div class="source">来自话题：{{topic}}</div>
         <div v-if="hasAnswer" class="user">{{user.username}}</div>
         <div class="title">{{title}}</div>
         <div v-if="hasAnswer">
