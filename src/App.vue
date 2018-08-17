@@ -2,8 +2,8 @@
   <div id="app">
       <Header></Header>
       <div class="headerSticky"></div>
+      <router-view></router-view>
       <Hinter></Hinter>
-      <Index></Index>
       <QuestionEditor></QuestionEditor>
   </div>
 </template>

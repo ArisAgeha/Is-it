@@ -23,9 +23,8 @@
 }
 .indexSidebar-wrapper {
     width: calc(30% - 5px);
-    background-color: #ddd;
     max-height: 80vh;
-    z-index: -1;
+    z-index: 0;
 }
 </style>
 

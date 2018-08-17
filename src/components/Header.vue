@@ -3,8 +3,8 @@
         <div class="header">
             <div class="tabs">
                 <span class="tabs-logo">IS-IT</span>
-                <span class="tabs-tab tabs-index">首页</span>
-                <span class="tabs-tab tabs-topic">话题</span>
+                <router-link to="/"><span class="tabs-tab tabs-index">首页</span></router-link>
+                <router-link to="/topic"><span class="tabs-tab tabs-topic">话题</span></router-link>
                 <div class="tabs-search-wrapper">
                     <input class="tabs-search-input" type="text">
                     <button @click="addQuestion" class="tabs-addQuestion-submit">提问</button>
