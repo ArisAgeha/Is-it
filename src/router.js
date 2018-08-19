@@ -14,7 +14,7 @@ export default new Router({
             component: Index
         },
         {
-            path: '/topic/:id',
+            path: '/topic',
             component: Topic
         }
     ]

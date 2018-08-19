@@ -1,10 +1,10 @@
 <template>
     <div class="index">
-        <div class="indexCard-wrapper">
-            <indexCard class="indexCard" v-for="data in dataArray" :cardInfo="data"></indexCard>
+        <div class="QuestionCard-wrapper">
+            <QuestionCard class="QuestionCard" v-for="data in dataArray" :cardInfo="data"></QuestionCard>
         </div>
         <div class="indexSidebar-wrapper" :style="translateY">
-            <indexSidebar></indexSidebar>
+            <Sidebar></Sidebar>
         </div>
     </div>
 </template>
@@ -18,7 +18,7 @@
     margin-top: 10px;
     justify-content: space-between;
 }
-.indexCard-wrapper {
+.QuestionCard-wrapper {
     width: calc(70% - 5px);
 }
 .indexSidebar-wrapper {
@@ -30,8 +30,8 @@
 
 <script>
 let req = require('../models/req.js');
-import indexCard from './indexCard.vue';
-import indexSidebar from './indexSidebar.vue';
+import QuestionCard from './QuestionCard.vue';
+import Sidebar from './Sidebar.vue';
 export default {
     data() {
         return {
@@ -40,8 +40,8 @@ export default {
         }
     },
     components: {
-        indexCard,
-        indexSidebar
+        QuestionCard,
+        Sidebar
     },
     beforeCreate() {
         req('get', '/fetch/index?skip=0').then((res) => {

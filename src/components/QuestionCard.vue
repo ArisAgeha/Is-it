@@ -1,5 +1,5 @@
 <template>
-    <div class="indexCard">
+    <div class="questionCard">
         <div class="source">来自话题：{{topic}}</div>
         <div v-if="hasAnswer" class="user">{{user.username}}</div>
         <div class="title">{{title}}</div>
@@ -20,7 +20,7 @@
 </template>
 
 <style>
-.indexCard {
+.questionCard {
     background-color: #fff;
     padding: 16px 20px;
     margin-bottom: 10px;
@@ -28,37 +28,37 @@
     border-radius: 2px;
     font-family: -apple-system,BlinkMacSystemFont,Helvetica Neue,PingFang SC,Microsoft YaHei,Source Han Sans SC,Noto Sans CJK SC,WenQuanYi Micro Hei,sans-serif;
 }
-.indexCard .source {
+.questionCard .source {
     margin-bottom: 8px;
     color: #8590a6;
     font-size: 15px;
 }
-.indexCard .user {
+.questionCard .user {
     font-weight: 600;
     margin-bottom: 14px;
 }
-.indexCard .title {
+.questionCard .title {
     font-weight: 600;
     font-size: 18px;
     margin-bottom: 6px;
 }
-.indexCard .extend {
+.questionCard .extend {
     margin-left: 1rem;
     color: #175199;
     cursor: pointer;
 }
-.indexCard .bottomBar {
+.questionCard .bottomBar {
     padding-top: 10px;
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 
-.indexCard .bottomBar .left{
+.questionCard .bottomBar .left{
     display: flex;
     align-items: center;
 }
-.indexCard .bottomBar .agreeCount {
+.questionCard .bottomBar .agreeCount {
     line-height: 30px;
     padding: 0 12px;
     color: #0084ff;
@@ -68,14 +68,14 @@
     cursor: pointer;
     border-radius: 3px;
 }
-.indexCard .bottomBar .commentCount {
+.questionCard .bottomBar .commentCount {
     margin-left: 24px;
     font-size: 14px;
     color: #8590a6;
     text-align: center;
     cursor: pointer;
 }
-.indexCard .bottomBar .closeText {
+.questionCard .bottomBar .closeText {
     color: #8590a6;
     cursor: pointer;
 }
