@@ -5,7 +5,7 @@
                 <div class="topicCard-wrapper">
                     <h4 class="topicCard-title">已关注的话题</h4>
                     <div class="topicCard-tabs">
-                        <div class="topic-tab" v-for="(tab, index) in topicTabs" :class="{active: isActive(tab)}" @click="switchTopic">{{ topicTabs[index].topicName }}</div>
+                        <div class="topic-tab" v-for="(tab, index) in topicTabs" :class="{active: isActive(tab)}" @click="switchTopic(tab)">{{ topicTabs[index].topicName }}</div>
                     </div>
                 </div>
                 <div v-if="tab" class="QuestionCard-wrapper">
@@ -59,7 +59,10 @@ export default {
             })
         },
         switchTopic(tab) { 
-
+            this.dataArray = null;
+            let topicID = tab.objectId;
+            this.fetchTopicQuestion(topicID);
+            this.tab = tab;
         }
     },
     computed: {
@@ -149,8 +152,5 @@ export default {
     align-items: center;
     font-size: 24px;
     color: #0084ff;
-}
-.hintNotFollow {
-
 }
 </style>
