@@ -76,6 +76,7 @@
 }
 .header-wrapper {
     box-shadow: 0 1px 3px rgba(26, 26, 26, .1);
+    z-index: 1;
     background-color: #fff;
     position: fixed;
     top:0;
