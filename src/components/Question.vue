@@ -14,33 +14,26 @@
             </div>
         </div>
         <div class="answer-wrapper">
-            <div v-for="(answer, index) in answers" class="answer-item">
-                <div class="answer-user">{{answer.userID.username}}</div>
-                <div class="answer-content">{{answer.content}}</div>
-                <div class="answer-ctrlPanel">
-                    <div :class="{active: answer.isAgree}" class="answer-agree" @click="agreeAnswer(answer)">赞同 {{answer.agreeCount}}</div>
-                    <div class="answer-comment" @click="toggleComment(index)">{{answer.commentCount}} 条评论</div>
-                </div>
-                <div class="answer-commentDetail" v-if="answer.show">{{answer.agreeCount}}</div>
-            </div>
+            <AnswerCard v-for="answer in answers" :answer="answer" class="answer-item"></AnswerCard>
         </div>
     </div>
 </template>
 
 <script>
 let req = require('../models/req.js');
+import AnswerCard from './AnswerCard.vue';
 export default {
+    components: {
+        AnswerCard
+    },
     data() {
         return {
             topicData: {},
             questionData: {},
-            answers: {},
+            answers: {}
         }
     },
     methods: {
-        toggleComment(index){
-            this.answers[index].show = true;
-        },
         agreeAnswer(answer) {
             if (!answer.isAgree) {
                 let url = '/answer/addAgree?answerID=' + answer.objectId; 
@@ -75,45 +68,6 @@ export default {
         border-radius: 2px;
         box-shadow: 0 1px 3px rgba(26,26,26,.1);
         margin-top: 12px;
-
-        .answer-item {
-            padding: 16px 0;
-            margin: 0 20px;
-            border-bottom: 1px solid #f6f6f6;
-
-            .answer-user {
-                font-size: 15px;
-                font-weight: 600;
-                margin-bottom: 8px;
-            }
-            .answer-content { }
-            .answer-ctrlPanel {
-                display: flex;
-                align-items: center;
-                margin-top: 8px;
-
-                .answer-agree {
-                    padding: 0 10px;
-                    color: #0084ff;
-                    background: rgba(0,132,255,.1);
-                    font-size: 14px;
-                    line-height: 32px;
-                    cursor: pointer;
-                    border-radius: 3px;
-                }
-                .answer-agree.active {
-                    color: #fff;
-                    background: #0084ff;
-                }
-                .answer-comment {
-                    margin-left: 24px;
-                    font-size: 14px;
-                    color: #8590a6;
-                }
-            }
-
-        }
-
     }
 }
 

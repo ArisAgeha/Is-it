@@ -55,7 +55,7 @@ export default {
             this.answer = answer;
             this.user = answer.userID;
             this.answerID = answer.objectId;
-            this.pageCount = answer.commentCount;
+            this.pageCount = Math.ceil(answer.commentCount / 20);
         }
         else this.hasAnswer = false; 
     },

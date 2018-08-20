@@ -1,11 +1,84 @@
 <template>
-    
+    <div class="answer-item">
+        <div class="answer-user">{{answer.userID.username}}</div>
+        <div class="answer-content">{{answer.content}}</div>
+        <div class="answer-ctrlPanel">
+            <div :class="{active: answer.isAgree}" class="answer-agree" @click="agreeAnswer(answer)">赞同 {{answer.agreeCount}}</div>
+            <div class="answer-comment" @click="toggleComment">{{answer.commentCount}} 条评论</div>
+        </div>
+        <div class="answer-commentWrapper" v-if="showComment">
+            <Comment :pageCount="pageCount" :answerID="answer.objectId"></Comment>
+        </div>
+    </div>
+
 </template>
 
 <script>
-    
+import Comment from './Comment.vue';
+
+export default {
+    props: ['answer'],
+    components: {
+        Comment
+    },
+    data() {
+        return {
+            showComment: false,
+        }
+    },
+    methods: {
+        toggleComment() {
+            this.showComment = !this.showComment;
+        },
+    },
+    computed: {
+        pageCount() {
+            return Math.ceil(this.answer.commentCount / 20);
+        }
+    }
+}
+
 </script>
 
-<style>
-    
+<style lang="scss">
+.answer-item {
+    padding: 16px 0;
+    margin: 0 20px;
+    border-bottom: 1px solid #f6f6f6;
+
+    .answer-user {
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+    .answer-content { }
+    .answer-ctrlPanel {
+        display: flex;
+        align-items: center;
+        margin-top: 8px;
+
+        .answer-agree {
+            padding: 0 10px;
+            color: #0084ff;
+            background: rgba(0,132,255,.1);
+            font-size: 14px;
+            line-height: 32px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        .answer-agree.active {
+            color: #fff;
+            background: #0084ff;
+        }
+        .answer-comment {
+            margin-left: 24px;
+            font-size: 14px;
+            color: #8590a6;
+            cursor: pointer;
+        }
+    }
+
+}
+
+
 </style>
