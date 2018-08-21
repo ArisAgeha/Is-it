@@ -18,10 +18,10 @@
     margin-top: 10px;
     justify-content: space-between;
 }
-.QuestionCard-wrapper {
+.index .QuestionCard-wrapper {
     width: calc(70% - 5px);
 }
-.indexSidebar-wrapper {
+.index .indexSidebar-wrapper {
     width: calc(30% - 5px);
     max-height: 80vh;
     z-index: 0;

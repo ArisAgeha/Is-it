@@ -3,7 +3,7 @@
         <div class="answer-user">{{answer.userID.username}}</div>
         <div class="answer-content">{{answer.content}}</div>
         <div class="answer-ctrlPanel">
-            <div :class="{active: answer.isAgree}" class="answer-agree" @click="agreeAnswer(answer)">赞同 {{answer.agreeCount}}</div>
+            <div :class="{active: answer.isAgree}" class="answer-agree" @click="agreeAnswer">赞同 {{answer.agreeCount}}</div>
             <div class="answer-comment" @click="toggleComment">{{answer.commentCount}} 条评论</div>
         </div>
         <div class="answer-commentWrapper" v-if="showComment">
@@ -14,6 +14,7 @@
 </template>
 
 <script>
+let req = require('../models/req.js');
 import Comment from './Comment.vue';
 
 export default {
@@ -30,6 +31,16 @@ export default {
         toggleComment() {
             this.showComment = !this.showComment;
         },
+        agreeAnswer() {
+            let answer = this.answer;
+            if (!answer.isAgree) {
+                let url = '/answer/addAgree?answerID=' + answer.objectId; 
+                req('get', url).then((res) => {
+                    answer.isAgree = true;
+                    answer.agreeCount++;
+                })
+            }
+        }
     },
     computed: {
         pageCount() {

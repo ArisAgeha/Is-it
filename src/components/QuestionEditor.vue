@@ -55,7 +55,7 @@ export default {
                 return res;
             })
             if (topicHasEmpty) {
-                this.$store.dispatch('hint', {text: '话题名不能为空！', hintStatus: 'fail'})
+                this.$store.dispatch('hint', {text: '话题不能为空！', hintStatus: 'fail'})
                 return;
             }
 

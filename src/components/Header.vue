@@ -242,6 +242,7 @@ export default {
             }).then((res) => {
                 if (res.username) {
                     this.$store.dispatch('hint', {text: '登录成功！', hintStatus: 'success'});
+                    window.location.reload();
                     this.showLogin= false;
                     return;
                 } else if (res.code === 211) {
@@ -294,6 +295,7 @@ export default {
             document.cookie = 'sessionToken=;  expires=Thu, 01 Jan 1970 00:00:01 GMT;'
             this.$store.commit('logout');
             this.$store.dispatch('hint', {text: '注销成功。', hintStatus: 'success'});
+            window.location.reload();
         }
     },
     computed: {

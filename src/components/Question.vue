@@ -8,13 +8,16 @@
                 <div class="qt-title">{{questionData.title}}</div>
                 <div class="qt-description">{{questionData.description}}</div>
                 <div class="qt-ctrlPanel">
-                    <div class="qt-followButton">关注问题</div>
-                    <div class="qt-addAnswer">写回答</div>
+                    <div @click="followQuestion" class="qt-followButton">{{followText}}</div>
+                    <div @click="writeAnswer" class="qt-addAnswer">写回答</div>
                 </div>
             </div>
         </div>
         <div class="answer-wrapper">
             <AnswerCard v-for="answer in answers" :answer="answer" class="answer-item"></AnswerCard>
+        </div>
+        <div class="answer-editor">
+            <AnswerEditor :questionID="questionData.objectId"></AnswerEditor>
         </div>
     </div>
 </template>
@@ -22,9 +25,11 @@
 <script>
 let req = require('../models/req.js');
 import AnswerCard from './AnswerCard.vue';
+import AnswerEditor from './AnswerEditor.vue';
 export default {
     components: {
-        AnswerCard
+        AnswerCard,
+        AnswerEditor
     },
     data() {
         return {
@@ -33,16 +38,28 @@ export default {
             answers: {}
         }
     },
-    methods: {
-        agreeAnswer(answer) {
-            if (!answer.isAgree) {
-                let url = '/answer/addAgree?answerID=' + answer.objectId; 
-                req('get', url).then((res) => {
-                    answer.isAgree = true;
-                    answer.agreeCount++;
-                })
-            }
+    computed: {
+        followText() {
+            return this.questionData.isFollow?'已关注': '关注问题';
         }
+    },
+    methods: {
+        followQuestion() {
+            if (this.$store.state.isLogin) {
+                if (!this.questionData.isFollow) {
+                    let questionID = this.questionData.objectId;
+                    req('get', '/follow/question?questionID=' + questionID).then((res) => {
+                    }).catch((err) => {
+                        this.$store.dispatch('hint', {text: '出现未知错误！', hintStatus: 'fail'});
+                    });
+                }
+            } else {
+                this.$store.dispatch('hint', {text: '请先登录！', hintStatus: 'fail'});
+            }
+        },
+        writeAnswer() {
+            this.$store.commit('toggleAnswerEditor');
+        },
     },
     beforeCreate() {
         let url = '/fetch/questionPage?skip=0&questionID=' + this.$route.params.id;
@@ -51,7 +68,7 @@ export default {
             this.questionData = res[0];
             this.answers = res[0].answers;
             this.topicData = res[0].topic;
-        })
+        });
     }
 }
 </script>
@@ -63,11 +80,10 @@ export default {
         display: flex;
         justify-content: center;
         flex-direction: column;
-        margin: auto;
         background: #fff;
         border-radius: 2px;
         box-shadow: 0 1px 3px rgba(26,26,26,.1);
-        margin-top: 12px;
+        margin: 12px auto;
     }
 }
 
@@ -136,10 +152,12 @@ export default {
             .qt-followButton { 
                 color: #fff;
                 background-color: #0084ff;
+                cursor: pointer;
             }
             .qt-addAnswer {
                 color: #0084ff;
                 border: 1px solid #0084ff;
+                cursor: pointer;
             }
         }
     }

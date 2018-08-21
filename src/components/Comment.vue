@@ -41,7 +41,10 @@
              @click="switchPage(page)"
              >{{page}}</span>
         </div>
-        <div class="addComment"></div>
+        <div class="addComment">
+            <div class="addComment-input" contenteditable="true" v-model="commentInput"></div>
+            <div class="addComment-button" @click="addComment">提交</div>
+        </div>
     </div>
 </template>
 
@@ -55,10 +58,25 @@ export default {
             currentPage: 1,
             comments: null,
             showDialog: false,
-            dialogList: []
+            dialogList: [],
+            commentInput: ''
         }
     },
     methods: {
+        addComment() {
+            if (this.commentInput === '') {
+                this.$store.state.dispatch('hint', {text: '评论内容不能为空！', hintStatus: 'fail'});
+                return;
+            } else if (this.commentInput.length > 150) {
+                this.$store.state.dispatch('hint', {text: '评论不能超过150字！', hintStatus: 'fail'});
+                return;
+            } else if (!this.$store.state.isLogin) {
+                this.$store.state.dispatch('hint', {text: '请先登录！', hintStatus: 'fail'});
+                return;
+            } else {
+
+            }
+        },
         getTimeInfo(item) {
             let createdAt = new Date(item.createdAt);
             let now = new Date();
@@ -187,8 +205,29 @@ export default {
 }
 </script>
 
+<style lang="scss">
+.addComment {
+    padding: 12px 20px;
+    background: #fff;
+    border-top: 1px solid #ebebeb;
+    display: flex;
 
-<style>
+    .addComment-input {
+        border: 1px solid #ebebeb;
+        flex: 1;
+        padding: 5px 12px;
+    }
+    .addComment-button {
+        background-color: #0077e6;
+        padding: 0 14px;
+        margin-left: 16px;
+        line-height: 34px;
+        border-radius: 3px;
+        cursor: pointer;
+        color: #fff;
+        height: 34px;
+    }
+}
 .commentWrapper {
     border: 1px solid #ebebeb;
     box-shadow: 0 1px 3px rgba(26,26,26,.1);
@@ -253,7 +292,7 @@ export default {
 .dialogWrapper {
     width: 688px;
     min-height: 100px;
-    height: calc(100vh - 24px * 2);
+    height: calc(100vh - 84px * 2);
     background-color: #fff;
     border-radius: 3px;
     overflow: hidden;

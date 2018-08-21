@@ -14,7 +14,8 @@ export default new Vuex.Store({
             hintStatus: 'success'
         },
         clock: null,
-        showQuestionEditor: false
+        showQuestionEditor: false,
+        showAnswerEditor: false
     },
     mutations: {
         login(state, payload) {
@@ -27,6 +28,9 @@ export default new Vuex.Store({
         },
         toggleQuestionEditor(state) {
             state.showQuestionEditor = !state.showQuestionEditor;
+        },
+        toggleAnswerEditor(state) {
+            state.showAnswerEditor = !state.showAnswerEditor;
         }
     },
     actions: {
