@@ -15,7 +15,8 @@ export default new Vuex.Store({
         },
         clock: null,
         showQuestionEditor: false,
-        showAnswerEditor: false
+        showAnswerEditor: false,
+        showDialog: false
     },
     mutations: {
         login(state, payload) {
@@ -31,6 +32,9 @@ export default new Vuex.Store({
         },
         toggleAnswerEditor(state) {
             state.showAnswerEditor = !state.showAnswerEditor;
+        },
+        toggleDialog(state) {
+            state.showDialog = !state.showDialog;
         }
     },
     actions: {

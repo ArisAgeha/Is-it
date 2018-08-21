@@ -1,7 +1,7 @@
 <template>
     <div class="commentWrapper">
         <div class="commentList">
-            <div v-for="comment in comments" class="commentItem">
+            <div v-for="(comment, index) in comments" class="commentItem">
                 <div class="comment-header">
                     <div class="comment-user">
                         {{comment.userID.username}}
@@ -11,28 +11,16 @@
                     <div class="comment-timeInfo">{{getTimeInfo(comment)}}</div>
                 </div>
                 <div class="comment-content">{{comment.content}}</div>
-                <div class="showDialog" v-if="hasDialog(comment)" @click="openDialog(comment)">查看对话</div>
-                <div class="dialogContainer" v-if="showDialog">
-                    <div class="dialogMask" @click="closeDialog">
-                        <div class="dialogWrapper" @click.stop>
-                            <div class="dialogTitle">查看对话</div>
-                            <div class="dialogCard-wrapper">
-                                <div class="dialogCard" v-for="dialogItem in dialogList">
-                                    <div class="dialog-header">
-                                        <div class="dialog-header-userInfo">
-                                            <span>{{dialogItem.userID.username}}</span>
-                                            <span v-if="dialogItem.replyTo" class="dialog-header-text">回复</span>
-                                            <span v-if="dialogItem.replyTo">{{dialogItem.replyTo}}</span>
-                                        </div>
-                                        <div class="dialog-header-timeInfo">{{getTimeInfo(dialogItem)}}</div>
-                                    </div>
-                                    <div class="dialog-content">{{dialogItem.content}}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="comment-ctrlPanel">
+                    <div class="showDialog" v-if="hasDialog(comment)" @click="openDialog(comment)">查看对话</div>
+                    <div class="replyToComment" @click="toggleReply(index)">回复</div>
+                </div>
+                <div class="comment-replyComment" v-if="showReply(index)">
+                    <div class="replyComment-input" contenteditable="true" v-model="replyInput"></div>
+                    <div class="replyComment-button" @click="replyComment(comment, index)">提交</div>
                 </div>
             </div>
+            <Dialog :queueID="replyQueue"></Dialog>
         </div>
         <div class="commentPage">
             <span :class="{currentPage: isCurrentPage(page), pagination: isPagination(page), nextPage: isNextPage(page), prevPage: isPrevPage(page)}" 
@@ -42,7 +30,7 @@
              >{{page}}</span>
         </div>
         <div class="addComment">
-            <div class="addComment-input" contenteditable="true" v-model="commentInput"></div>
+            <div class="addComment-input" contenteditable="true"></div>
             <div class="addComment-button" @click="addComment">提交</div>
         </div>
     </div>
@@ -50,31 +38,93 @@
 
 <script>
 let req = require('../models/req.js');
+import Dialog from './Dialog.vue';
 export default {
     props: ['answerID', 'pageCount'],
+    components: {
+        Dialog
+    },
     data() {
         return {
             pages: [],
             currentPage: 1,
             comments: null,
             showDialog: false,
-            dialogList: [],
-            commentInput: ''
+            replyQueue: '',
+            replyInput: '123',
+            showReplyIndex: []
         }
     },
+    computed: {
+    },
     methods: {
-        addComment() {
-            if (this.commentInput === '') {
-                this.$store.state.dispatch('hint', {text: '评论内容不能为空！', hintStatus: 'fail'});
+        showReply(index) {
+            return this.showReplyIndex[index];
+        },
+        toggleReply(index) {
+            if (this.showReplyIndex.length < index + 1) this.showReplyIndex.length = index + 1;
+            this.showReplyIndex.splice(index, 1, !this.showReplyIndex[index]);
+        },
+        replyComment(comment, index) {
+            let content = this.$el.querySelectorAll('.commentItem')[index].querySelector('.replyComment-input').innerText;
+            if (content === '') {
+                this.$store.dispatch('hint', {text: '评论内容不能为空！', hintStatus: 'fail'});
                 return;
-            } else if (this.commentInput.length > 150) {
-                this.$store.state.dispatch('hint', {text: '评论不能超过150字！', hintStatus: 'fail'});
+            } else if (content.length > 150) {
+                this.$store.dispatch('hint', {text: '评论不能超过150字！', hintStatus: 'fail'});
                 return;
             } else if (!this.$store.state.isLogin) {
-                this.$store.state.dispatch('hint', {text: '请先登录！', hintStatus: 'fail'});
+                this.$store.dispatch('hint', {text: '请先登录！', hintStatus: 'fail'});
                 return;
             } else {
+                let body = {
+                    answerID: this.answerID,
+                    replyTo: comment.userID.username,
+                    replyQueue: comment.replyQueue || comment.objectId, // 回复对象的评论队列ID（队列最初的被评论对象的ID）
+                    hasReply: false,
+                    content,
+                    targetData: {
+                        id: comment.objectId, // 回复对象的评论ID
+                        hasReply: comment.hasReply,
+                    }
+                }
+                req('POST', '/comment/addComment', body).then((res) => {
+                    this.$store.dispatch('hint', {text: '评论成功！', hintStatus: 'success'});
+                    res.userID.username = this.$store.state.currentUser.username;
+                    this.comments.unshift(res);
+                    this.showReplyIndex.splice(index, 1, !this.showReplyIndex[index]);
+                })
+            }
 
+        },
+        addComment() {
+            let content = this.$el.querySelector('.addComment-input').innerText;
+            if (content === '') {
+                this.$store.dispatch('hint', {text: '评论内容不能为空！', hintStatus: 'fail'});
+                return;
+            } else if (content.length > 150) {
+                this.$store.dispatch('hint', {text: '评论不能超过150字！', hintStatus: 'fail'});
+                return;
+            } else if (!this.$store.state.isLogin) {
+                this.$store.dispatch('hint', {text: '请先登录！', hintStatus: 'fail'});
+                return;
+            } else {
+                let body = {
+                    answerID: this.answerID,
+                    replyTo: '',
+                    replyQueue: '', // 回复对象的评论队列ID（队列最初的被评论对象的ID）
+                    hasReply: false,
+                    content,
+                    targetData: {
+                        id: '', // 回复对象的评论ID
+                        hasReply: false,
+                    }
+                }
+                req('POST', '/comment/addComment', body).then((res) => {
+                    this.$store.dispatch('hint', {text: '评论成功！', hintStatus: 'success'});
+                    res.userID.username = this.$store.state.currentUser.username;
+                    this.comments.unshift(res);
+                })
             }
         },
         getTimeInfo(item) {
@@ -82,6 +132,7 @@ export default {
             let now = new Date();
             let elapsed = now - createdAt;
             let elapsedMins = Math.floor(elapsed / 1000 / 60);
+            if (elapsedMins < 5) return `刚刚`
             if (elapsedMins < 60) return `${elapsedMins} 分钟前`
 
             let elapsedHours = Math.floor(elapsedMins / 60);
@@ -112,15 +163,8 @@ export default {
             }
         },
         openDialog(comment) {
-            let queueID = comment.replyQueue;
-            this.showDialog = true;
-            let url = `/fetch/dialog?queueID=${queueID}`;
-            req('get', url).then((res) => {
-                this.dialogList = res;
-            })
-        },
-        closeDialog() {
-            this.showDialog = false;
+            this.replyQueue = comment.replyQueue;
+            this.$store.commit('toggleDialog');
         },
         hasDialog(comment) {
             if (comment.replyQueue) return true;
@@ -206,28 +250,6 @@ export default {
 </script>
 
 <style lang="scss">
-.addComment {
-    padding: 12px 20px;
-    background: #fff;
-    border-top: 1px solid #ebebeb;
-    display: flex;
-
-    .addComment-input {
-        border: 1px solid #ebebeb;
-        flex: 1;
-        padding: 5px 12px;
-    }
-    .addComment-button {
-        background-color: #0077e6;
-        padding: 0 14px;
-        margin-left: 16px;
-        line-height: 34px;
-        border-radius: 3px;
-        cursor: pointer;
-        color: #fff;
-        height: 34px;
-    }
-}
 .commentWrapper {
     border: 1px solid #ebebeb;
     box-shadow: 0 1px 3px rgba(26,26,26,.1);
@@ -272,64 +294,61 @@ export default {
     cursor: default;
     color: #8590a6;
 }
-.showDialog {
-    color: #77839c;
-    font-size: 14px;
-    margin-top: 6px;
-    cursor: pointer;
-}
-.dialogMask {
-    position: fixed;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.2);
+.comment-ctrlPanel {
     display: flex;
+    justify-content: flex-start;
     align-items: center;
-    justify-content: center;
+
+    .showDialog,
+    .replyToComment {
+        margin-right: 16px;
+        color: #77839c;
+        font-size: 14px;
+        margin-top: 6px;
+        cursor: pointer;
+    }
 }
-.dialogWrapper {
-    width: 688px;
-    min-height: 100px;
-    height: calc(100vh - 84px * 2);
-    background-color: #fff;
-    border-radius: 3px;
-    overflow: hidden;
+.comment-replyComment {
+    padding: 12px 0;
+    background: #fff;
     display: flex;
-    flex-direction: column;
+
+    .replyComment-input {
+        border: 1px solid #ebebeb;
+        flex: 1;
+        padding: 5px 12px;
+    }
+    .replyComment-button {
+        background-color: #0077e6;
+        padding: 0 14px;
+        margin-left: 16px;
+        line-height: 34px;
+        border-radius: 3px;
+        cursor: pointer;
+        color: #fff;
+        height: 34px;
+    }
 }
-.dialogWrapper .dialogTitle {
-    padding: 0 20px;
-    height: 50px;
-    min-height: 50px;
-    border-bottom: 1px solid #f6f6f6;
+.addComment {
+    padding: 12px 20px;
+    background: #fff;
+    border-top: 1px solid #ebebeb;
     display: flex;
-    align-items: center;
-    font-size: 15px;
-    line-height: 1.7;
-    color: #1a1a1a;
-    font-weight: bold;
-}
-.dialogWrapper .dialogCard-wrapper{
-    overflow: auto;
-}
-.dialogWrapper .dialogCard {
-    padding: 12px 0 10px;
-    margin: 0 20px;
-    border-bottom: 1px solid #f6f6f6;
-}
-.dialogWrapper .dialog-header {
-    margin-bottom: 6px;
-    display: flex;
-    justify-content: space-between;
-}
-.dialogWrapper .dialog-header .dialog-header-timeInfo{
-    font-size: 14px;
-    color: #8590a6;
-}
-.dialogWrapper .dialog-header .dialog-header-text {
-    color: #8590a6;
-    margin: 0 .5rem;
+
+    .addComment-input {
+        border: 1px solid #ebebeb;
+        flex: 1;
+        padding: 5px 12px;
+    }
+    .addComment-button {
+        background-color: #0077e6;
+        padding: 0 14px;
+        margin-left: 16px;
+        line-height: 34px;
+        border-radius: 3px;
+        cursor: pointer;
+        color: #fff;
+        height: 34px;
+    }
 }
 </style>
