@@ -14,11 +14,6 @@
                 <div class="hintNotFollow" v-else>您尚未关注任何话题！</div>
             </div>
             <div class="indexSidebar-wrapper" :style="translateY">
-                <div class="topic-discoveryTopic">
-                    <router-link to="/topics">
-                        <button class="topic-gotoTopics">进入话题广场</button>
-                    </router-link>
-                </div>
                 <Sidebar></Sidebar>
             </div>
         </div>
@@ -98,7 +93,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 .topicContainer {
     width: 1000px;
     min-height: 100vh;
@@ -106,42 +101,42 @@ export default {
     margin: auto;
     margin-top: 10px;
     justify-content: space-between;
-    .topic-left {
-        display: flex;
-        flex-direction: column;
-        width: calc(70% - 5px);
-        .topicCard-wrapper {
-            background-color: #fff;
-            padding: 16px 20px;
-            margin-bottom: 10px;
-            box-shadow: 0 1px 3px rgba(26,26,26,.1);
-            border-radius: 2px;
-            font-family: -apple-system,BlinkMacSystemFont,Helvetica Neue,PingFang SC,Microsoft YaHei,Source Han Sans SC,Noto Sans CJK SC,WenQuanYi Micro Hei,sans-serif;
-            .topicCard-tabs {
-                display: flex;
-            }
-            .topicCard-title{
-                margin-bottom: 10px;
-            }
-            .topicCard-tabs .topic-tab {
-                margin: 0 10px 10px 0;
-                border-radius: 30px;
-                text-decoration: none;
-                border: 1px solid #daecf5;
-                color: #259;
-                font-size: 13px;
-                line-height: 1.7;
-                word-wrap: break-word;
-                padding: 0 10px;
-                cursor: pointer;
-            }
-            .topicCard-tabs .topic-tab.active {
-                background: #259;
-                border-color: #259;
-                color: #fff;
-            }
-        }
-    }
+}
+.topic-left {
+    display: flex;
+    flex-direction: column;
+    width: calc(70% - 5px);
+}
+.topic-left .topicCard-wrapper {
+    background-color: #fff;
+    padding: 16px 20px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 3px rgba(26,26,26,.1);
+    border-radius: 2px;
+    font-family: -apple-system,BlinkMacSystemFont,Helvetica Neue,PingFang SC,Microsoft YaHei,Source Han Sans SC,Noto Sans CJK SC,WenQuanYi Micro Hei,sans-serif;
+}
+.topic-left .topicCard-tabs {
+    display: flex;
+}
+.topic-left .topicCard-title{
+    margin-bottom: 10px;
+}
+.topic-left .topicCard-tabs .topic-tab {
+    margin: 0 10px 10px 0;
+    border-radius: 30px;
+    text-decoration: none;
+    border: 1px solid #daecf5;
+    color: #259;
+    font-size: 13px;
+    line-height: 1.7;
+    word-wrap: break-word;
+    padding: 0 10px;
+    cursor: pointer;
+}
+.topic-left .topicCard-tabs .topic-tab.active {
+    background: #259;
+    border-color: #259;
+    color: #fff;
 }
 .QuestionCard-wrapper {
     width: 100%;
@@ -158,23 +153,4 @@ export default {
     font-size: 24px;
     color: #0084ff;
 }
-.topic-discoveryTopic {
-    background-color: #fff;
-    padding: 16px 20px;
-    margin-bottom: 10px;
-    box-shadow: 0 1px 3px rgba(26,26,26,.1);
-    border-radius: 2px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    button {
-        background-color: #0084ff;
-        color: #fff;
-        line-height: 34px;
-        border-radius: 3px;
-        padding: 0 14px;
-    }
-}
-
 </style>

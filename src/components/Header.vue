@@ -242,7 +242,7 @@ export default {
             }).then((res) => {
                 if (res.username) {
                     this.$store.dispatch('hint', {text: '登录成功！', hintStatus: 'success'});
-                    window.location.reload();
+                    window.location.reload(true);
                     this.showLogin= false;
                     return;
                 } else if (res.code === 211) {
@@ -295,7 +295,7 @@ export default {
             document.cookie = 'sessionToken=;  expires=Thu, 01 Jan 1970 00:00:01 GMT;'
             this.$store.commit('logout');
             this.$store.dispatch('hint', {text: '注销成功。', hintStatus: 'success'});
-            window.location.reload();
+            window.location.reload(true);
         }
     },
     computed: {
@@ -307,7 +307,18 @@ export default {
         }
     },
     mounted() {
-        let cookieMatch = document.cookie.match(/(?<=\bsessionToken=)\w+/);
+        /* 备用版本
+        console.log(document.cookie);
+        let userCookie;
+        if (document.cookie) userCookie = document.cookie.slice(13);
+        if (userCookie) {
+            this.$store.dispatch('loginByCookie', {sessionToken: userCookie}).then((res) => {
+                console.log(res);
+            })
+        }
+        */
+
+        let cookieMatch = document.cookie.match(/(?<=sessionToken=)\w+/);
         if (cookieMatch && cookieMatch[0]) {
             let userCookie = cookieMatch[0];
             if (userCookie) {
