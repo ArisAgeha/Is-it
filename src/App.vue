@@ -28,6 +28,7 @@ export default {
 * {border: 0; margin: 0; box-sizing: border-box;}
 li {list-style: none;}
 a {text-decoration: none; color: inherit;}
+button {cursor: pointer;}
 body {
     font-family: -apple-system,BlinkMacSystemFont,Helvetica Neue,PingFang SC,Microsoft YaHei,Source Han Sans SC,Noto Sans CJK SC,WenQuanYi Micro Hei,sans-serif;
     font-size: 15px;

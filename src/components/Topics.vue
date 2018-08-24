@@ -1,23 +1,26 @@
 <template>
-    <div class="topic">
-        <div v-if="isLogin" class="topicContainer">
-            <div class="topic-left">
-                <div class="topicCard-wrapper">
-                    <h4 class="topicCard-title">已关注的话题</h4>
-                    <div class="topicCard-tabs">
-                        <div class="topic-tab" v-for="(tab, index) in topicTabs" :class="{active: isActive(tab)}" @click="switchTopic(tab)">{{ topicTabs[index].topicName }}</div>
+    <div class="topics">
+        <div class="topicsContainer">
+            <div class="topics-left">
+                <div class="topicsCard-wrapper">
+                    <h4 class="topicsCard-title">话题广场</h4>
+                    <div class="topicsCard-tabs">
+                        <div class="topics-tab" v-for="(tab, index) in topicTabs" :class="{active: isActive(tab)}" @click="switchTopic(tab)">{{tab?tab.topicName: null}}</div>
                     </div>
                 </div>
-                <div v-if="tab" class="QuestionCard-wrapper">
+                <div class="QuestionCard-wrapper">
                     <QuestionCard class="QuestionCard" v-for="data in dataArray" :cardInfo="data"></QuestionCard>
                 </div>
-                <div class="hintNotFollow" v-else>您尚未关注任何话题！</div>
             </div>
             <div class="indexSidebar-wrapper" :style="translateY">
+                <div class="topics-currentTab">
+                    <div class="topics-currentTabName">{{tab?tab.topicName: null}}</div>
+                    <button v-if="isFollow" @click="removeFollow">取消关注</button>
+                    <button v-else="isFollow" @click="addFollow">关注</button>
+                </div>
                 <Sidebar></Sidebar>
             </div>
         </div>
-        <div class="hintNotLogin" v-else>请先登录！</div>
     </div>
 </template>
 
@@ -28,10 +31,12 @@ import Sidebar from './Sidebar.vue';
 export default {
     data() {
         return {
-            dataArray: null,
+            dataArray: [],
             topicTabs: null,
             shiftY: 0,
-            tab: null
+            tab: null,
+            isFollow: false,
+            skip: 0
         }
     },
     components: {
@@ -43,32 +48,58 @@ export default {
             return tab === this.tab;
         },
         fetchTopic() {
-            req('get', '/fetch/topic').then((res) => {
+            req('get', '/fetch/topics').then((res) => {
                 this.topicTabs = res;
                 this.tab = res[0];
                 this.fetchTopicQuestion(this.tab.objectId);
             });
         },
         fetchTopicQuestion(topicID) {
-            let body = {
-                skip: 0,
-                topicID
-            }
-            req('POST', '/fetch/topicQuestion', body).then((res) => {
-                this.dataArray = res;
+            this.fetchTopicIsFollow(topicID);
+            let url = `/fetch/topicQuestion?skip=${this.skip}&topicID=${topicID}`
+            req('get', url).then((res) => {
+                if (!this.dataArray) this.dataArray = [];
+                this.dataArray = this.dataArray.concat(res);
+                this.skip += 20;
+            })
+        },
+        fetchTopicIsFollow(topicID) {
+            let url = `/fetch/topicIsFollow?topicID=${topicID}`
+            req('get', url).then((res) => {
+                this.isFollow = res;
             })
         },
         switchTopic(tab) { 
-            this.dataArray = null;
+            this.skip = 0;
+            this.dataArray = [];
             let topicID = tab.objectId;
             this.fetchTopicQuestion(topicID);
             this.tab = tab;
+        },
+        addFollow() {
+            let topicID = this.tab.objectId;
+            let url = `/follow/topic?topicID=${topicID}`;
+            req('get', url).then((res) => {
+                this.isFollow = true;
+                this.$store.dispatch('hint', {text: '关注成功！', hintStatus: 'success'});
+            }).catch((err) => {
+                this.$store.dispatch('hint', {text: '出现未知错误！', hintStatus: 'fail'});
+            })
+        },
+        removeFollow() {
+            let topicID = this.tab.objectId;
+            let url = `/follow/removeTopic?topicID=${topicID}`;
+            req('get', url).then((res) => {
+                this.isFollow = false;
+                this.$store.dispatch('hint', {text: '取消成功！', hintStatus: 'success'});
+            }).catch((err) => {
+                this.$store.dispatch('hint', {text: '出现未知错误！', hintStatus: 'fail'});
+            })
         }
     },
     computed: {
         isLogin() {
             if (this.$store.state.isLogin) {
-                this.fetchTopic();
                 return true;
             } else {
                 this.dataArray = null;
@@ -89,54 +120,55 @@ export default {
             let value = window.pageYOffset;
             this.shiftY = value;
         }
+        this.fetchTopic();
     }
 }
 </script>
 
-<style>
-.topicContainer {
+<style lang="scss">
+.topicsContainer {
     width: 1000px;
     min-height: 100vh;
     display: flex;
     margin: auto;
     margin-top: 10px;
     justify-content: space-between;
-}
-.topic-left {
-    display: flex;
-    flex-direction: column;
-    width: calc(70% - 5px);
-}
-.topic-left .topicCard-wrapper {
-    background-color: #fff;
-    padding: 16px 20px;
-    margin-bottom: 10px;
-    box-shadow: 0 1px 3px rgba(26,26,26,.1);
-    border-radius: 2px;
-    font-family: -apple-system,BlinkMacSystemFont,Helvetica Neue,PingFang SC,Microsoft YaHei,Source Han Sans SC,Noto Sans CJK SC,WenQuanYi Micro Hei,sans-serif;
-}
-.topic-left .topicCard-tabs {
-    display: flex;
-}
-.topic-left .topicCard-title{
-    margin-bottom: 10px;
-}
-.topic-left .topicCard-tabs .topic-tab {
-    margin: 0 10px 10px 0;
-    border-radius: 30px;
-    text-decoration: none;
-    border: 1px solid #daecf5;
-    color: #259;
-    font-size: 13px;
-    line-height: 1.7;
-    word-wrap: break-word;
-    padding: 0 10px;
-    cursor: pointer;
-}
-.topic-left .topicCard-tabs .topic-tab.active {
-    background: #259;
-    border-color: #259;
-    color: #fff;
+    .topics-left {
+        display: flex;
+        flex-direction: column;
+        width: calc(70% - 5px);
+        .topicsCard-wrapper {
+            background-color: #fff;
+            padding: 16px 20px;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 3px rgba(26,26,26,.1);
+            border-radius: 2px;
+            font-family: -apple-system,BlinkMacSystemFont,Helvetica Neue,PingFang SC,Microsoft YaHei,Source Han Sans SC,Noto Sans CJK SC,WenQuanYi Micro Hei,sans-serif;
+            .topicsCard-tabs {
+                display: flex;
+            }
+            .topicsCard-title{
+                margin-bottom: 10px;
+            }
+            .topicsCard-tabs .topics-tab {
+                margin: 0 10px 10px 0;
+                border-radius: 30px;
+                text-decoration: none;
+                border: 1px solid #daecf5;
+                color: #259;
+                font-size: 13px;
+                line-height: 1.7;
+                word-wrap: break-word;
+                padding: 0 10px;
+                cursor: pointer;
+            }
+            .topicsCard-tabs .topics-tab.active {
+                background: #259;
+                border-color: #259;
+                color: #fff;
+            }
+        }
+    }
 }
 .QuestionCard-wrapper {
     width: 100%;
@@ -146,11 +178,30 @@ export default {
     max-height: 80vh;
     z-index: 0;
 }
-.hintNotLogin {
+.topics-currentTab {
+    background-color: #fff;
+    padding: 16px 20px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 3px rgba(26,26,26,.1);
+    border-radius: 2px;
     display: flex;
-    justify-content: center;
+    justify-content: space-around;
     align-items: center;
-    font-size: 24px;
-    color: #0084ff;
+    flex-direction: column;
+
+    .topics-currentTabName {
+        font-size: 18px;
+        margin-bottom: 12px;
+    }
+    button {
+        background-color: #0084ff;
+        color: #fff;
+        padding: 0 14px;
+        line-height: 34px;
+        border-radius: 3px;
+        height: 34px;
+        cursor: pointer;
+    }
 }
+
 </style>

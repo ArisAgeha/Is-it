@@ -56,8 +56,7 @@ export default {
             this.user = answer.userID;
             this.answerID = answer.objectId;
             this.pageCount = Math.ceil(answer.commentCount / 20);
-        }
-        else this.hasAnswer = false; 
+        } else this.hasAnswer = false; 
     },
     methods: {
         switchText() {

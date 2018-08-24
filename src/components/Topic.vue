@@ -1,7 +1,7 @@
 <template>
     <div class="topic">
-        <div v-if="isLogin" class="topicContainer">
-            <div class="topic-left">
+        <div class="topicContainer">
+            <div v-if="isLogin" class="topic-left">
                 <div class="topicCard-wrapper">
                     <h4 class="topicCard-title">已关注的话题</h4>
                     <div class="topicCard-tabs">
@@ -13,6 +13,7 @@
                 </div>
                 <div class="hintNotFollow" v-else>您尚未关注任何话题！</div>
             </div>
+            <div class="hintNotLogin" v-else>请先登录！</div>
             <div class="indexSidebar-wrapper" :style="translateY">
                 <div class="topic-discoveryTopic">
                     <router-link to="/topics">
@@ -22,7 +23,6 @@
                 <Sidebar></Sidebar>
             </div>
         </div>
-        <div class="hintNotLogin" v-else>请先登录！</div>
     </div>
 </template>
 
@@ -33,10 +33,11 @@ import Sidebar from './Sidebar.vue';
 export default {
     data() {
         return {
-            dataArray: null,
+            dataArray: [],
             topicTabs: null,
             shiftY: 0,
-            tab: null
+            tab: null,
+            skip: 0
         }
     },
     components: {
@@ -55,16 +56,15 @@ export default {
             });
         },
         fetchTopicQuestion(topicID) {
-            let body = {
-                skip: 0,
-                topicID
-            }
-            req('POST', '/fetch/topicQuestion', body).then((res) => {
-                this.dataArray = res;
+            let url = `/fetch/topicQuestion?skip=${this.skip}&topicID=${topicID}`
+            req('get', url).then((res) => {
+                this.dataArray = this.dataArray.concat(res);
+                this.skip += 20;
             })
         },
         switchTopic(tab) { 
-            this.dataArray = null;
+            this.skip = 0;
+            this.dataArray = [];
             let topicID = tab.objectId;
             this.fetchTopicQuestion(topicID);
             this.tab = tab;
@@ -153,10 +153,10 @@ export default {
 }
 .hintNotLogin {
     display: flex;
-    justify-content: center;
-    align-items: center;
     font-size: 24px;
+    justify-content: center;
     color: #0084ff;
+    width: calc(70% - 5px);
 }
 .topic-discoveryTopic {
     background-color: #fff;
@@ -169,6 +169,7 @@ export default {
     align-items: center;
 
     button {
+        cursor: pointer;
         background-color: #0084ff;
         color: #fff;
         line-height: 34px;

@@ -64,7 +64,6 @@ export default {
     beforeCreate() {
         let url = '/fetch/questionPage?skip=0&questionID=' + this.$route.params.id;
         req('get', url).then((res) => {
-            console.log(res);
             this.questionData = res[0];
             this.answers = res[0].answers;
             this.topicData = res[0].topic;

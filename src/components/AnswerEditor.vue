@@ -49,6 +49,7 @@ export default {
             req('POST', '/answer/addAnswer', body).then((res) => {
                 this.toggleAnswerEditor();
                 this.$store.dispatch('hint', {text: '已添加回答！', hintStatus: 'success'})
+                window.location.reload();
             }).catch(err => {
                 this.$store.dispatch('hint', {text: '出现未知错误！请重试！', hintStatus: 'fail'})
             })

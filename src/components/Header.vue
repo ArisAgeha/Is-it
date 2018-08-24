@@ -2,7 +2,7 @@
     <div class="header-wrapper">
         <div class="header">
             <div class="tabs">
-                <span class="tabs-logo">IS-IT</span>
+                <router-link to="/"><span class="tabs-logo">IS-IT</span></router-link>
                 <router-link to="/"><span class="tabs-tab tabs-index">首页</span></router-link>
                 <router-link to="/topic"><span class="tabs-tab tabs-topic">话题</span></router-link>
                 <div class="tabs-search-wrapper">
