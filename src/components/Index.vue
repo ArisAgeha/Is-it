@@ -35,8 +35,11 @@ import Sidebar from './Sidebar.vue';
 export default {
     data() {
         return {
-            dataArray: null,
-            shiftY: 0
+            dataArray: [],
+            shiftY: 0,
+            skip: 0,
+            hasMoreContent: true,
+            canLoadMore: false
         }
     },
     components: {
@@ -44,8 +47,12 @@ export default {
         Sidebar
     },
     beforeCreate() {
-        req('get', '/fetch/index?skip=0').then((res) => {
-            this.dataArray = res;
+        let url = '/fetch/index?skip=' + this.skip;
+        req('get', url).then((res) => {
+            this.dataArray = this.dataArray.concat(res);
+            this.skip += 20;
+            console.log(this.skip)
+            this.canLoadMore = true;
         })
     },
     computed: {
@@ -56,10 +63,25 @@ export default {
         }
     },
     created() {
-        window.onscroll = () => {
-            let value = window.pageYOffset;
-            this.shiftY = value;
-        }
+        window.addEventListener('scroll', () => {
+            this.shiftY = window.pageYOffset;
+
+            if (window.innerHeight + document.documentElement.scrollTop === document.body.scrollHeight) {
+                if (this.hasMoreContent && this.canLoadMore) {
+                    console.log(this.skip)
+                    let url = '/fetch/index?skip=' + this.skip;
+                    console.log(url)
+                    req('get', url).then((res) => {
+                        this.dataArray = this.dataArray.concat(res);
+                        this.skip += 20;
+                    }).catch((err) => {
+                        this.hasMoreContent = false;
+                        this.$store.dispatch('hint', {text: '已无更多内容！', hintStatus: 'fail'});
+                    }) 
+                }
+            }
+            
+        }) 
     }
 }
 </script>

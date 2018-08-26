@@ -39,6 +39,12 @@ export default {
                     answer.isAgree = true;
                     answer.agreeCount++;
                 })
+            } else {
+                let url = '/answer/removeAgree?answerID=' + answer.objectId;
+                req('get', url).then((res) => {
+                    answer.isAgree = false;
+                    answer.agreeCount--;
+                })
             }
         }
     },

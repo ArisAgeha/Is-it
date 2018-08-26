@@ -4,13 +4,13 @@
         <div v-if="hasAnswer" class="user">{{user.username}}</div>
         <router-link :to='"/question/" + questionID'><div class="title">{{title}}</div></router-link>
         <div v-if="hasAnswer">
-            <div v-if="showEllipsis">{{answer.ellipsis}} <span @click="switchText" class="extend">阅读全文</span></div>
+            <div v-if="showEllipsis && answer.ellipsis">{{answer.ellipsis}} <span @click="switchText" class="extend">阅读全文</span></div>
             <div v-else>{{answer.content}}</div>
         </div>
         <div v-else class="questionDescription">{{description}}</div>
         <div v-if="hasAnswer" class="bottomBar">
             <div class="left">
-                <div class="agreeCount" :class="isAgree">赞同 {{answer.agreeCount}}</div>
+            <div :class="{isAgree: answer.isAgree}" class="agreeCount" @click="agreeAnswer">赞同 {{answer.agreeCount}}</div>
                 <div class="commentCount" @click="switchComment">{{answer.commentCount}} <span>条评论</span></div> 
             </div>
             <div class="closeText" @click="switchText" v-if="!showEllipsis">收起</div>
@@ -45,7 +45,9 @@ export default {
     },
     computed: {
         topic() {
-            return this.cardInfo.topic.join('、');
+            if (this.cardInfo.topic) {
+                return this.cardInfo.topic.join('、');
+            }
         }
     },
     created() {
@@ -64,6 +66,22 @@ export default {
         },
         switchComment() {
             this.showComment = !this.showComment;
+        },
+        agreeAnswer() {
+            let answer = this.answer;
+            if (!answer.isAgree) {
+                let url = '/answer/addAgree?answerID=' + answer.objectId; 
+                req('get', url).then((res) => {
+                    answer.isAgree = true;
+                    answer.agreeCount++;
+                })
+            } else {
+                let url = '/answer/removeAgree?answerID=' + answer.objectId;
+                req('get', url).then((res) => {
+                    answer.isAgree = false;
+                    answer.agreeCount--;
+                })
+            }
         }
     }
 }
@@ -118,6 +136,10 @@ export default {
     font-size: 14px;
     cursor: pointer;
     border-radius: 3px;
+}
+.questionCard .bottomBar .agreeCount.isAgree {
+    color: #fff;
+    background: #0084ff;
 }
 .questionCard .bottomBar .commentCount {
     margin-left: 24px;

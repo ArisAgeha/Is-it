@@ -49,6 +49,16 @@ export default {
                 if (!this.questionData.isFollow) {
                     let questionID = this.questionData.objectId;
                     req('get', '/follow/question?questionID=' + questionID).then((res) => {
+                        this.$store.dispatch('hint', {text: '关注成功！', hintStatus: 'success'});
+                        this.questionData.isFollow = true;
+                    }).catch((err) => {
+                        this.$store.dispatch('hint', {text: '出现未知错误！', hintStatus: 'fail'});
+                    });
+                } else {
+                    let questionID = this.questionData.objectId;
+                    req('get', '/follow/removeQuestion?questionID=' + questionID).then((res) => {
+                        this.$store.dispatch('hint', {text: '取消关注成功！', hintStatus: 'success'});
+                        this.questionData.isFollow = false;
                     }).catch((err) => {
                         this.$store.dispatch('hint', {text: '出现未知错误！', hintStatus: 'fail'});
                     });
@@ -64,6 +74,7 @@ export default {
     beforeCreate() {
         let url = '/fetch/questionPage?skip=0&questionID=' + this.$route.params.id;
         req('get', url).then((res) => {
+            console.log(res);
             this.questionData = res[0];
             this.answers = res[0].answers;
             this.topicData = res[0].topic;

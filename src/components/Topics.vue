@@ -36,7 +36,9 @@ export default {
             shiftY: 0,
             tab: null,
             isFollow: false,
-            skip: 0
+            skip: 0,
+            hasMoreContent: true,
+            canLoadMore: false
         }
     },
     components: {
@@ -59,6 +61,7 @@ export default {
             let url = `/fetch/topicQuestion?skip=${this.skip}&topicID=${topicID}`
             req('get', url).then((res) => {
                 if (!this.dataArray) this.dataArray = [];
+                this.canLoadMore = true;
                 this.dataArray = this.dataArray.concat(res);
                 this.skip += 20;
             })
@@ -70,6 +73,8 @@ export default {
             })
         },
         switchTopic(tab) { 
+            this.canLoadMore = false;
+            this.hasMoreContent = true;
             this.skip = 0;
             this.dataArray = [];
             let topicID = tab.objectId;
@@ -119,6 +124,21 @@ export default {
         window.onscroll = () => {
             let value = window.pageYOffset;
             this.shiftY = value;
+            if (window.innerHeight + document.documentElement.scrollTop === document.body.scrollHeight) {
+                let topicID = this.tab.objectId;
+                if (this.hasMoreContent && this.canLoadMore) {
+                    let url = `/fetch/topicQuestion?skip=${this.skip}&topicID=${topicID}`
+                    req('get', url).then((res) => {
+                        this.dataArray = this.dataArray.concat(res);
+                        this.skip += 20;
+                    }).catch((err) => {
+                        this.hasMoreContent = false;
+                        this.$store.dispatch('hint', {text: '已无更多内容！', hintStatus: 'fail'});
+                    }) 
+                } else {
+                    this.$store.dispatch('hint', {text: '已无更多内容！', hintStatus: 'fail'});
+                }
+            }
         }
         this.fetchTopic();
     }
@@ -146,6 +166,7 @@ export default {
             font-family: -apple-system,BlinkMacSystemFont,Helvetica Neue,PingFang SC,Microsoft YaHei,Source Han Sans SC,Noto Sans CJK SC,WenQuanYi Micro Hei,sans-serif;
             .topicsCard-tabs {
                 display: flex;
+                flex-wrap: wrap;
             }
             .topicsCard-title{
                 margin-bottom: 10px;
