@@ -17,7 +17,7 @@
 </template>
 
 <script>
-let req = require('../models/req.js');
+import req from '../models/req.js';
 export default {
     data() {
         return {

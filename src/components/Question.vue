@@ -23,7 +23,7 @@
 </template>
 
 <script>
-let req = require('../models/req.js');
+import req from '../models/req.js';
 import AnswerCard from './AnswerCard.vue';
 import AnswerEditor from './AnswerEditor.vue';
 export default {

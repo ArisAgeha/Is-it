@@ -27,7 +27,7 @@
 </template>
 
 <script>
-let req = require('../models/req.js');
+import req from '../models/req.js';
 import QuestionCard from './QuestionCard.vue';
 import Sidebar from './Sidebar.vue';
 export default {

@@ -20,7 +20,7 @@
 </template>
 
 <script>
-let req = require('../models/req.js');
+import req from '../models/req.js';
 import Comment from './Comment.vue';
 
 export default {

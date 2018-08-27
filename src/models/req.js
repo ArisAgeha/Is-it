@@ -11,4 +11,4 @@ function req(method, path, body) {
         return res.json();
     })
 }
-module.exports = req;
+export default req;

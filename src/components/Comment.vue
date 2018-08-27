@@ -37,7 +37,7 @@
 </template>
 
 <script>
-let req = require('../models/req.js');
+import req from '../models/req.js';
 import Dialog from './Dialog.vue';
 export default {
     props: ['answerID', 'pageCount'],
