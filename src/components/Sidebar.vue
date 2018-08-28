@@ -13,7 +13,7 @@
             <span class="count">{{answerCount}}</span>
         </div>
         <div class="myFollowingQuestion indexSidebar-tab">
-            <span class="text">我关注的问题</span>
+            <span class="text">我的问题</span>
             <span class="count">{{questionCount}}</span>
         </div>
     </div>
