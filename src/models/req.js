@@ -1,5 +1,5 @@
 function req(method, path, body) {
-    let url = 'http://localhost:3000' + path;
+    let url = 'http://132.232.48.58:3000' + path;
     return fetch(url, {
         method,
         body: JSON.stringify(body) || undefined,
